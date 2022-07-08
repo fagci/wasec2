@@ -4,6 +4,7 @@ require 'uri'
 require 'net/http'
 require 'yaml'
 
+# Contains methods to match with dict & regexps
 class String
   def match_dict(dict)
     words = File.open("./data/#{dict}.txt").map(&:chomp)
@@ -12,9 +13,9 @@ class String
   end
 
   def match_regexps(reg_hash)
-    reg_hash.map do |name, re|
-      [name, scan(re).uniq]
-    end.to_h
+    reg_hash.transform_values do |re|
+      scan(re).uniq
+    end
   end
 end
 
@@ -48,7 +49,7 @@ class WASec
 
       case result
       when Hash
-        items = result.filter_map{ |k, v| "- #{k}: #{v.join(', ')}" unless v.empty? }.join("\n")
+        items = result.filter_map { |k, v| "- #{k}: #{v.join(', ')}" unless v.empty? }.join("\n")
         puts "#{c}:\n#{items}" unless items.empty?
       when Array
         puts "#{c}: #{result.join(', ')}"
@@ -58,7 +59,8 @@ class WASec
 
   def check
     @response = Net::HTTP.get_response @uri
-    @header, @body = @response.header, @response.body
+    @header = @response.header
+    @body = @response.body
 
     check_body
   end
