@@ -20,8 +20,14 @@ class String
 end
 
 class WASec
-  INTERESTING_HEADERS = ['access-control-allow-origin', 'server', 'set-cookie',
-    'via', 'x-backend-server', 'x-powered-by'].freeze
+  INTERESTING_HEADERS = %w[
+    access-control-allow-origin
+    server
+    set-cookie
+    via
+    x-backend-server
+    x-powered-by
+  ].freeze
   def initialize(url)
     @uri = URI url
   end
