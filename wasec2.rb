@@ -20,6 +20,8 @@ class String
 end
 
 class WASec
+  INTERESTING_HEADERS = ['access-control-allow-origin', 'server', 'set-cookie',
+    'via', 'x-backend-server', 'x-powered-by'].freeze
   def initialize(url)
     @uri = URI url
   end
@@ -42,6 +44,10 @@ class WASec
     @body.match_regexps ANALYTICS
   end
 
+  def check_header
+    @header.slice(*INTERESTING_HEADERS)
+  end
+
   def check_body(checks = %w[techs cms contacts analytics])
     checks.each do |c|
       result = send(c)
@@ -59,9 +65,10 @@ class WASec
 
   def check
     @response = Net::HTTP.get_response @uri
-    @header = @response.header
+    @header = @response.to_hash
     @body = @response.body
 
+    puts check_header
     check_body
   end
 end
